@@ -1,4 +1,4 @@
-#Ignore build output and Visual Studio temp file
+# Ignore build output and Visual Studio temp file
 *.obj
 *.exe
 *.dll
@@ -30,3 +30,6 @@
 _[Rr]eSharper*/
 [Tt]est[Rr]esult*/
 .vs/
+
+# Ignore Duende.IdentityServer automatic features
+keys/
