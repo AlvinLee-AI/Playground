@@ -47,7 +47,7 @@ namespace IdentityServer
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile
                     },
-                    RedirectUris = { "https://localhost:5002/signin-oidc" },
+                    RedirectUris = { "https://localhost:5002/signin-oidc", "https://localhost:5001/signin-google" },
                     PostLogoutRedirectUris = { "https://localhost:5002/signout-callback-oidc" }
                 }
             };
