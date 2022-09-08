@@ -9,7 +9,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Reflection;
 using System.Runtime;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace IdentityServer
 {
@@ -27,15 +30,30 @@ namespace IdentityServer
         {
             services.AddControllersWithViews();
 
-            var builder = services.AddIdentityServer(options =>
-            {
-                // https://docs.duendesoftware.com/identityserver/v5/fundamentals/resources/
-                options.EmitStaticAudienceClaim = true;
-            })
-                .AddInMemoryIdentityResources(Config.IdentityResources)
-                .AddInMemoryApiScopes(Config.ApiScopes)
-                .AddInMemoryClients(Config.Clients)
-                .AddTestUsers(TestUsers.Users);
+            var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+            const string dbConnectionString = @"Data Source=Duende.IdentityServer.Quickstart.EntityFramework.db";
+
+            services
+                .AddIdentityServer(options =>
+                {
+                    // https://docs.duendesoftware.com/identityserver/v5/fundamentals/resources/
+                    options.EmitStaticAudienceClaim = true;
+                })
+                // Ignore in-memory resources in favour of EF store provider
+                //.AddInMemoryIdentityResources(Config.IdentityResources)
+                //.AddInMemoryApiScopes(Config.ApiScopes)
+                //.AddInMemoryClients(Config.Clients)
+                .AddTestUsers(TestUsers.Users)
+                .AddConfigurationStore(options =>
+                {
+                    options.ConfigureDbContext = b => 
+                        b.UseSqlite(dbConnectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
+                })
+                .AddOperationalStore(options =>
+                {
+                    options.ConfigureDbContext = b => 
+                        b.UseSqlite(dbConnectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
+                });
 
             var googleClientId = System.Environment.GetEnvironmentVariable("OIDC_GOOGLE_CLIENTID");
             var googleClientSecret = System.Environment.GetEnvironmentVariable("OIDC_GOOGLE_SECRET");
