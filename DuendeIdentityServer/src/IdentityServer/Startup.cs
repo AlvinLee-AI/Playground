@@ -34,27 +34,36 @@ namespace IdentityServer
             services.AddControllersWithViews();
 
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+            // Duende EF integration provides template db
             const string dbConnectionString = @"Data Source=Duende.IdentityServer.Quickstart.EntityFramework.db";
+
+            // Custom EF-supported db
+            //const string dbConnectionString = @"Data Source=(LocalDb)\MSSQLLocalDB;database=YourIdentityServerDatabase;trusted_connection=yes;";
 
             services
                 .AddIdentityServer(options =>
                 {
                     // https://docs.duendesoftware.com/identityserver/v5/fundamentals/resources/
                     options.EmitStaticAudienceClaim = true;
+                    
+                    // Refresh configuration store data from database
+                    options.Caching.IdentityProviderCacheDuration = TimeSpan.FromMinutes(5);
+                    options.Caching.ClientStoreExpiration = TimeSpan.FromMinutes(5);
                 })
                 // Ignore in-memory resources in favour of EF store provider
                 //.AddInMemoryIdentityResources(Config.IdentityResources)
                 //.AddInMemoryApiScopes(Config.ApiScopes)
                 //.AddInMemoryClients(Config.Clients)
-                .AddTestUsers(TestUsers.Users)
+                //.AddTestUsers(TestUsers.Users)
                 .AddConfigurationStore(options =>
                 {
-                    options.ConfigureDbContext = b => 
+                    options.DefaultSchema = "myConfigurationSchema";
+                    options.ConfigureDbContext = b =>
                         b.UseSqlite(dbConnectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
                 })
                 .AddOperationalStore(options =>
                 {
-                    options.ConfigureDbContext = b => 
+                    options.ConfigureDbContext = b =>
                         b.UseSqlite(dbConnectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
                 });
 

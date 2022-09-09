@@ -5,8 +5,8 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Duende.IdentityServer" Version="5.1.0" />
-    <PackageReference Include="Duende.IdentityServer.EntityFramework" Version="5.1.0" />
+    <PackageReference Include="Duende.IdentityServer" Version="5.2.4" />
+    <PackageReference Include="Duende.IdentityServer.EntityFramework" Version="5.2.4" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="3.1.28" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.28">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

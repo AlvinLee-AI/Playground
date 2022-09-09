@@ -33,12 +33,14 @@ namespace IdentityServerHost.Quickstart.UI
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IClientStore _clientStore;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
+        private  IIdentityProviderStore _identityProviderStore;
         private readonly IEventService _events;
 
         public AccountController(
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,
             IAuthenticationSchemeProvider schemeProvider,
+            IIdentityProviderStore identityProviderStore,
             IEventService events,
             TestUserStore users = null)
         {
@@ -49,6 +51,7 @@ namespace IdentityServerHost.Quickstart.UI
             _interaction = interaction;
             _clientStore = clientStore;
             _schemeProvider = schemeProvider;
+            _identityProviderStore = identityProviderStore;
             _events = events;
         }
 
@@ -269,6 +272,16 @@ namespace IdentityServerHost.Quickstart.UI
                     DisplayName = x.DisplayName ?? x.Name,
                     AuthenticationScheme = x.Name
                 }).ToList();
+
+            var dynamicProviders = (await _identityProviderStore.GetAllSchemeNamesAsync())
+                .Where(x => x.Enabled)
+                .Select(x => new ExternalProvider
+                {
+                    AuthenticationScheme = x.Scheme,
+                    DisplayName = x.DisplayName,
+                });
+            
+            providers.AddRange(dynamicProviders);
 
             var allowLocal = true;
             if (context?.Client.ClientId != null)
