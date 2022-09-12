@@ -282,6 +282,7 @@ namespace IdentityServerHost.Quickstart.UI
                 });
             
             providers.AddRange(dynamicProviders);
+            Console.WriteLine(providers);
 
             var allowLocal = true;
             if (context?.Client.ClientId != null)

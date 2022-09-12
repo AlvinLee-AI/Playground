@@ -37,9 +37,6 @@ namespace IdentityServer
             // Duende EF integration provides template db
             const string dbConnectionString = @"Data Source=Duende.IdentityServer.Quickstart.EntityFramework.db";
 
-            // Custom EF-supported db
-            //const string dbConnectionString = @"Data Source=(LocalDb)\MSSQLLocalDB;database=YourIdentityServerDatabase;trusted_connection=yes;";
-
             services
                 .AddIdentityServer(options =>
                 {
@@ -80,8 +77,8 @@ namespace IdentityServer
                 {
                     options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
 
-                    options.ClientId = googleClientId;
-                    options.ClientSecret = googleClientSecret;
+                    options.ClientId = "796649104179-3d4pd2avcaepuvrnh9ob9cb50ggsu9b9.apps.googleusercontent.com";
+                    options.ClientSecret = "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";
                 })
                 .AddOpenIdConnect("oidc", "Demo IdentityServer", options => 
                 {

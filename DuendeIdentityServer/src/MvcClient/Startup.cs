@@ -46,7 +46,7 @@ namespace MvcClient
                 options.SaveTokens = true;
 
                 // Gets additional claims from UserInfo endpoint
-                options.Scope.Add("profile");
+                options.Scope.Add("openid profile");
                 options.GetClaimsFromUserInfoEndpoint = true;
             });
         }
