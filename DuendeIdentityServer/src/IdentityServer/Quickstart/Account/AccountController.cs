@@ -267,22 +267,30 @@ namespace IdentityServerHost.Quickstart.UI
 
             var providers = schemes
                 .Where(x => x.DisplayName != null)
-                .Select(x => new ExternalProvider
+                .Select(x => new OidcProvider
                 {
                     DisplayName = x.DisplayName ?? x.Name,
-                    AuthenticationScheme = x.Name
+                    Scheme = x.Name
                 }).ToList();
 
-            var dynamicProviders = (await _identityProviderStore.GetAllSchemeNamesAsync())
+
+            // AQ-28852 IIdentityProviderStore grabs IdP configurations from db, from which we can
+            //          presumably create new OIDC configurations
+            var dynamicProviderSchemes = (await _identityProviderStore.GetAllSchemeNamesAsync())
+                .Select(providerNames => providerNames.Scheme)
+                .Distinct();
+            var dynamicProviders = dynamicProviderSchemes
+                .Select(scheme => _identityProviderStore.GetBySchemeAsync(scheme).Result)
                 .Where(x => x.Enabled)
-                .Select(x => new ExternalProvider
+                .Select(x => new OidcProvider
                 {
-                    AuthenticationScheme = x.Scheme,
                     DisplayName = x.DisplayName,
+                    Scheme = x.DisplayName,
+                    ClientId = x.Properties["ClientId"],
+                    ClientSecret = x.Properties["ClientSecret"]
                 });
             
             providers.AddRange(dynamicProviders);
-            Console.WriteLine(providers);
 
             var allowLocal = true;
             if (context?.Client.ClientId != null)
@@ -294,7 +302,7 @@ namespace IdentityServerHost.Quickstart.UI
 
                     if (client.IdentityProviderRestrictions != null && client.IdentityProviderRestrictions.Any())
                     {
-                        providers = providers.Where(provider => client.IdentityProviderRestrictions.Contains(provider.AuthenticationScheme)).ToList();
+                        providers = providers.Where(provider => client.IdentityProviderRestrictions.Contains(provider.Scheme)).ToList();
                     }
                 }
             }

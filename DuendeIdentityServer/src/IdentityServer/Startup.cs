@@ -43,7 +43,8 @@ namespace IdentityServer
                     // https://docs.duendesoftware.com/identityserver/v5/fundamentals/resources/
                     options.EmitStaticAudienceClaim = true;
                     
-                    // Refresh configuration store data from database
+                    // AQ-28852 Cache dynamic, custom IdentityProvider configurations to improve performance
+                    //          Refreshes configuration store data from database after specified time
                     options.Caching.IdentityProviderCacheDuration = TimeSpan.FromMinutes(5);
                     options.Caching.ClientStoreExpiration = TimeSpan.FromMinutes(5);
                 })
@@ -52,6 +53,9 @@ namespace IdentityServer
                 //.AddInMemoryApiScopes(Config.ApiScopes)
                 //.AddInMemoryClients(Config.Clients)
                 //.AddTestUsers(TestUsers.Users)
+
+                // AQ-28852 Dynamic IdentityProvider configurations stored in DB, rather than statically
+                //          loading configurations via .AddAuthentication() calls below
                 .AddConfigurationStore(options =>
                 {
                     options.DefaultSchema = "myConfigurationSchema";
@@ -72,6 +76,7 @@ namespace IdentityServer
                 return;
             }
 
+            // Statically loads external IdentityProvider configurations
             services.AddAuthentication()
                 .AddGoogle("Google", options =>
                 {
@@ -106,7 +111,7 @@ namespace IdentityServer
                 app.UseDeveloperExceptionPage();
             }
 
-            // Seed database with in-memory configuration data
+            // Seed database with in-memory configuration data. Used only for demo purposes
             InitializeDatabase(app);
 
             // Enables basic MVC UI
