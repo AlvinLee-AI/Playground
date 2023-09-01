@@ -33,3 +33,6 @@ _[Rr]eSharper*/
 
 # Ignore Duende.IdentityServer automatic features
 keys/
+
+# Ignore IDEA files
+.idea/
